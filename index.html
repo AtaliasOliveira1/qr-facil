@@ -4,16 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>QR Fácil - Gerador de QR Code</title>
-  <link
-    rel="icon"
-    href="https://cdn-icons-png.flaticon.com/512/159/159078.png"
-    type="image/png"
-  />
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/159/159078.png" type="image/png" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <link
-    href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-    rel="stylesheet"
-  />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
   <style>
     html.dark body {
       background-color: #1f2937;
@@ -24,94 +17,60 @@
       background-color: #374151;
       color: white;
     }
-    /* Força o tamanho menor na exibição do QR Code */
     #qrcode img {
-      width: 256px !important;
-      height: 256px !important;
-      image-rendering: pixelated; /* para ficar nítido ao redimensionar */
+      max-width: 100%;
+      height: auto;
+      image-rendering: pixelated;
     }
   </style>
 </head>
-<body
-  class="bg-gray-100 text-gray-900 transition-colors duration-300 min-h-screen flex flex-col"
->
-  <header
-    class="text-center py-6 bg-blue-700 text-white text-3xl font-bold shadow relative"
-  >
+<body class="bg-gray-100 text-gray-900 transition-colors duration-300 min-h-screen flex flex-col">
+  <header class="text-center py-6 bg-blue-700 text-white text-3xl font-bold shadow relative">
     QR Fácil
     <p class="text-sm font-normal">Gere QR Code de Links e Redes Wi-Fi</p>
-    <button
-      onclick="toggleTheme()"
-      class="absolute right-4 top-4 px-3 py-1 text-sm bg-white text-blue-700 rounded hover:bg-gray-200"
-    >
+    <button onclick="toggleTheme()" class="absolute right-4 top-4 px-3 py-1 text-sm bg-white text-blue-700 rounded hover:bg-gray-200">
       🌗 Tema
     </button>
   </header>
 
   <main class="max-w-xl mx-auto mt-10 px-4 flex-1">
     <div class="flex justify-center space-x-4 mb-6">
-      <button
-        onclick="showLinkForm()"
-        class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700"
-      >
+      <button onclick="showLinkForm()" class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700">
         Link
       </button>
-      <button
-        onclick="showWifiForm()"
-        class="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700"
-      >
+      <button onclick="showWifiForm()" class="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700">
         Wi-Fi
       </button>
     </div>
 
     <!-- Link Form -->
     <div id="linkForm" class="text-center space-y-4">
-      <input
-        id="linkInput"
-        class="border p-2 rounded-lg w-full"
-        placeholder="https://exemplo.com"
-      />
-      <button
-        onclick="generateLinkQR()"
-        class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-      >
+      <input id="linkInput" class="border p-2 rounded-lg w-full" placeholder="https://exemplo.com" />
+      <button onclick="generateLinkQR()" class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
         Gerar QR Code
       </button>
     </div>
 
     <!-- Wi-Fi Form -->
     <div id="wifiForm" class="hidden text-center space-y-4">
-      <input
-        id="ssid"
-        class="border p-2 rounded w-full"
-        placeholder="Nome da Rede (SSID)"
-      />
+      <input id="ssid" class="border p-2 rounded w-full" placeholder="Nome da Rede (SSID)" />
       <input id="password" class="border p-2 rounded w-full" placeholder="Senha" />
       <select id="encryption" class="border p-2 rounded w-full">
         <option value="WPA">WPA/WPA2</option>
         <option value="WEP">WEP</option>
         <option value="nopass">Aberta</option>
       </select>
-      <button
-        onclick="generateWifiQR()"
-        class="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-      >
+      <button onclick="generateWifiQR()" class="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
         Gerar QR Code
       </button>
     </div>
 
     <!-- QR Code Output -->
     <div class="flex justify-center mt-10">
-      <div
-        id="qrCard"
-        class="hidden bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg w-fit text-center"
-      >
+      <div id="qrCard" class="hidden bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg w-fit text-center">
         <div id="qrcode" class="mb-4"></div>
         <div id="downloadBtnWrapper" class="hidden">
-          <button
-            onclick="downloadQR()"
-            class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-900"
-          >
+          <button onclick="downloadQR()" class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-900">
             📥 Baixar QR Code
           </button>
         </div>
@@ -144,6 +103,7 @@
       qrCard.classList.remove("hidden");
       lastText = text;
 
+      // Gerar com resolução alta (para download), mas responsivo na tela
       new QRCode(qrDiv, {
         text,
         width: 1024,
@@ -151,7 +111,13 @@
         correctLevel: QRCode.CorrectLevel.H,
       });
 
-      setTimeout(() => document.getElementById("downloadBtnWrapper").classList.remove("hidden"), 300);
+      setTimeout(() => {
+        const img = qrDiv.querySelector("img");
+        if (img) {
+          img.classList.add("max-w-xs", "w-full", "h-auto", "mx-auto");
+        }
+        document.getElementById("downloadBtnWrapper").classList.remove("hidden");
+      }, 300);
     }
 
     function showLinkForm() {
